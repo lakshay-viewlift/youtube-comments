@@ -4,7 +4,7 @@ import { getLiveChatId, fetchChatMessages } from "../../api";
 import "./style.scss";
 
 function Home() {
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState({});
   const [streamUrl, setStreamUrl] = useState(null);
   const [tag, setTag] = useState(null);
   const [resp, setResp] = useState([]);
@@ -13,8 +13,7 @@ function Home() {
   const onSubmit = async () => {
     setInProgress(true);
     const id = await getLiveChatId(streamUrl);
-    debugger
-    await fetchChatMessages(null, id, items => setResp(state => [...state, ...items]));
+    await fetchChatMessages(null, id, items => setResp(state => [...state, ...items]), tags);
     setInProgress(false);
   };
   return resp && resp.length > 0 ? (
@@ -43,7 +42,7 @@ function Home() {
           onChange={e => (e && e.target && e.target.value ? setTag(e.target.value) : null)}
           onKeyDown={e => {
             if (e.key === "Enter") {
-              tag && setTags(state => [...state, tag]);
+              tag && setTags(state => ({...state, [tag]: true}));
               inputRef.current.value = null;
               setTag(null);
             }
@@ -51,9 +50,9 @@ function Home() {
           disabled={tags && tags.length >= 10 ? true : false}
         />
         <div id="tags">
-          {tags && tags.length > 0 && (
+          {tags && Object.keys(tags).length > 0 && (
             <ol>
-              {tags.map(tag => (
+              {Object.keys(tags).map(tag => (
                 <li key={tag}>
                   <h2>{tag}</h2>
                 </li>
@@ -64,7 +63,7 @@ function Home() {
       </div>
       <br />
       <div class="select">
-        <button type="submit" disabled={tags.length <= 0 || !streamUrl || inprogress ? true : false} onClick={onSubmit}>
+        <button type="submit" disabled={(tags && Object.keys(tags).length <= 0) || !streamUrl || inprogress ? true : false} onClick={onSubmit}>
           Subscribe
         </button>
       </div>

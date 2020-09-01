@@ -1,4 +1,4 @@
-const axios = require('axios');
+const axios = require("axios");
 const API_KEY = "AIzaSyAj2f_o5CTbS6Ql8VwuxcUp4p-OToT8taA";
 
 export const getLiveChatId = url => {
@@ -13,11 +13,11 @@ export const getLiveChatId = url => {
       return temp;
     })
     .catch(error => {
-        console.log("Lakshay: ", error);
+      console.log("Lakshay: ", error);
     });
 };
 
-export const fetchChatMessages = async (nextPageToken, liveChatId, callback) => {
+export const fetchChatMessages = async (nextPageToken, liveChatId, callback, tags) => {
   const URL_Y = `https://www.googleapis.com/youtube/v3/liveChat/messages`;
   const params = {
     liveChatId: liveChatId,
@@ -26,14 +26,26 @@ export const fetchChatMessages = async (nextPageToken, liveChatId, callback) => 
     maxResults: 200,
     pageToken: nextPageToken,
   };
-  return axios.get(URL_Y, { params }).then(async ({data}) => {
-    const {nextPageToken = null, pollingIntervalMillis = null} = data; 
-    data && data.items && callback(data.items); 
+  return axios
+    .get(URL_Y, { params })
+    .then(async ({ data }) => {
+      const { nextPageToken = null, pollingIntervalMillis = null } = data;
+      if (data && data.items) {
+        const items = [...data.items].filter(item => {
+          const msg = item && item.snippet && item.snippet.displayMessage;
+          for (let key in tags) {
+            if (msg.includes(key)) return true;
+          }
+          return false;
+        });
+        callback(items);
+      }
 
-    // console.log(data);
-    if (!pollingIntervalMillis) return [];
-    setTimeout(async () => await fetchChatMessages(nextPageToken, liveChatId, callback), pollingIntervalMillis);
-  }).catch(err => {
-    console.log("Lakshay Dutt: ", err);
-  });
+      // console.log(data);
+      if (!pollingIntervalMillis) return [];
+      setTimeout(async () => await fetchChatMessages(nextPageToken, liveChatId, callback, tags), pollingIntervalMillis);
+    })
+    .catch(err => {
+      console.log("Lakshay Dutt: ", err);
+    });
 };
