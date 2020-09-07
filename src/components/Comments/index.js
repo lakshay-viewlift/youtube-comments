@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
 import moment from "moment";
-import respo from "../../functions/resp";
 export default ({ items }) => {
   return (
     <Fragment>
@@ -8,7 +7,8 @@ export default ({ items }) => {
         <div class="comments-container">
           <h1>Live Comments</h1>
           <ul id="comments-list" class="comments-list">
-            {[...items].map(({ snippet, authorDetails }, i) => {
+            {[...items].map(({ snippet = {}, authorDetails = {} }, i) => {
+              if (!snippet || !authorDetails) return <Fragment />;
               const { publishedAt, displayMessage } = snippet;
               const { displayName, isChatOwner, profileImageUrl } = authorDetails;
               return (

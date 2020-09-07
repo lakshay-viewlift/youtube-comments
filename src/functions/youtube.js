@@ -1,6 +1,7 @@
 const axios = require("axios");
-const API_KEY = "AIzaSyAj2f_o5CTbS6Ql8VwuxcUp4p-OToT8taA";
-
+const API_KEY = "AIzaSyBLPue7o7Leq87XSbHJKrApcQ32itvCa5c";
+// AIzaSyBLPue7o7Leq87XSbHJKrApcQ32itvCa5c
+// AIzaSyAj2f_o5CTbS6Ql8VwuxcUp4p-OToT8taA
 const getLiveChatId = url => {
   const parsedUrl = new URL(url);
   const videoId = parsedUrl.searchParams.get("v");
@@ -34,9 +35,7 @@ const fetchChatMessages = async (nextPageToken, liveChatId, callback, tags) => {
         const items = [...data.items].filter(item => {
           const msg = item && item.snippet && item.snippet.displayMessage;
           for (let key in tags) {
-              const v = tags[key];
-              console.log(v, msg.includes(key));
-            if (msg.includes(v)) return true;
+            if (msg.includes(key)) return true;
           }
           return false;
         });

@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
+import io from "socket.io-client";
 import Comments from "../../components/Comments";
-import { getLiveChatId, fetchChatMessages } from "../../api";
 import "./style.scss";
 
 function Home() {
@@ -12,8 +12,12 @@ function Home() {
   const inputRef = React.createRef();
   const onSubmit = async () => {
     setInProgress(true);
-    const id = await getLiveChatId(streamUrl);
-    await fetchChatMessages(null, id, items => setResp(state => [...state, ...items]), tags);
+    const ioClient = io.connect("http://localhost:8000");
+    ioClient.emit("subscribe", { videoUrl: streamUrl, keywords: tags });
+    ioClient.on("comment", function (comment) {
+      debugger
+      setResp(state => [...state, ...comment]);
+    });
     setInProgress(false);
   };
   return resp && resp.length > 0 ? (
@@ -47,7 +51,7 @@ function Home() {
               setTag(null);
             }
           }}
-          disabled={tags && tags.length >= 10 ? true : false}
+          disabled={tags && Object.keys(tags).length >= 10 ? true : false}
         />
         <div id="tags">
           {tags && Object.keys(tags).length > 0 && (
