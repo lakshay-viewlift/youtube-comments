@@ -1,5 +1,5 @@
 const axios = require("axios");
-const API_KEY = "AIzaSyAj2f_o5CTbS6Ql8VwuxcUp4p-OToT8taA";
+const API_KEY = "";
 
 const getLiveChatId = url => {
   const parsedUrl = new URL(url);
